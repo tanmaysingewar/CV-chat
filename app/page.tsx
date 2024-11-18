@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Component1Icon, PersonIcon } from "@radix-ui/react-icons";
@@ -53,6 +52,7 @@ export default function Home() {
           ...prev,
           { message: "There was an error fetching the response. Please try again.", sender: "bot", responseTime: "N/A" },
         ]);
+        console.log(error)
       } finally {
         // Stop the bot typing animation
         setIsBotTyping(false);
