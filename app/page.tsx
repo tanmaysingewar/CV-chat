@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Component1Icon, PersonIcon, PaperPlaneIcon, DashboardIcon } from "@radix-ui/react-icons"
+import { Component1Icon, PersonIcon, PaperPlaneIcon } from "@radix-ui/react-icons"
 import { useState, useRef, useEffect } from "react"
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
 
@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
 
 export default function Home() {
   // State for messages
