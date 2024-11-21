@@ -266,7 +266,7 @@ export default function Home() {
           <div className="flex flex-col justify-between m-auto w-full h-screen">
             <header className="flex h-14 flex-row items-center border-b p-2">
               <SidebarTrigger className="h-8 w-8" />
-              <p className="h-8 text-center mt-[10px] font-bold ml-4">CV Playground</p>
+              <p className="h-8 text-center mt-[10px] font-bold ml-4">Novi Playground</p>
             </header>
             <ScrollArea
               ref={scrollAreaRef}
@@ -409,7 +409,7 @@ function SidebarNav({
   return (
     <Sidebar className="">
       <div className="m-2">
-        <p className="text-lg font-semibold">Culture VO AI</p>
+        <p className="text-lg font-semibold">Novi AI</p>
         <p className="text-xs text-gray-700 ">
           Select the Personality and the LLM you want
         </p>
