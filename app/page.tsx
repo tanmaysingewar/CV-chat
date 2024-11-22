@@ -255,7 +255,7 @@ export default function Home() {
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full">
+      <div className="flex h-vh w-full">
         <SidebarNav
           personality={personality}
           setPersonality={setPersonality}
