@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Component1Icon, PersonIcon, PaperPlaneIcon } from "@radix-ui/react-icons"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
 
 import {
@@ -44,22 +44,162 @@ export default function Home() {
     }
   }[]>([])
 
-  // Ref for scroll area
-  const scrollAreaRef = useRef<HTMLDivElement>(null)
-
   // State for bot typing
   const [isBotTyping, setIsBotTyping] = useState(false)
+
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const lastMessageRef = useRef<HTMLDivElement>(null);
+  const typingIndicatorRef = useRef<HTMLDivElement>(null);
+
+  // Enhanced scroll to bottom function
+  const scrollToBottom = useCallback(() => {
+    if (!scrollAreaRef.current || !shouldAutoScroll) return;
+
+    const scrollElement = scrollAreaRef.current;
+
+    // Prioritize scrolling to typing indicator if present
+    if (isBotTyping && typingIndicatorRef.current) {
+      typingIndicatorRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+    // Otherwise scroll to last message
+    else if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+    // Fallback to scrolling the container
+    else {
+      scrollElement.scrollTo({
+        top: scrollElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [shouldAutoScroll, isBotTyping]);
+
+  // Handle scroll events to detect manual scrolling
+  useEffect(() => {
+    const scrollElement = scrollAreaRef.current;
+    if (!scrollElement) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = scrollElement;
+      const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100;
+      setShouldAutoScroll(isNearBottom);
+    };
+
+    scrollElement.addEventListener('scroll', handleScroll);
+    return () => scrollElement.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Scroll on new messages, bot typing status change, or when typing indicator appears/disappears
+  useEffect(() => {
+    // Add a small delay to ensure DOM updates are complete
+      scrollToBottom();
+  }, [messages, isBotTyping, scrollToBottom]);
+
+  // Force scroll to bottom on initial load
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+    }
+  }, []);
+
+  // Updated message rendering to include ref for last message
+  const renderMessages = () => {
+    return messages.map((message, index) => {
+      const isLastMessage = index === messages.length - 1;
+      const messageRef = isLastMessage ? lastMessageRef : null;
+
+      return (
+        <div key={index} className="w-full" ref={messageRef}>
+          {message.sender === "user" ? (
+            <div className="px-4 py-2 bg-green-100 rounded mt-2 pt-3 w-full mx-auto">
+              <div className="flex flex-row items-center">
+                <PersonIcon className="mr-1 h-3 w-3" />
+                <p className="text-xs text-gray-700 font-bold">You</p>
+              </div>
+              <p className="mt-1">{message.message}</p>
+            </div>
+          ) : (
+            <div>
+              <div className="pt-2 bg-gray-200 rounded mt-2 mx-auto p-1">
+                <div className="flex flex-row items-center px-2">
+                  <Component1Icon className="mr-1 h-3 w-3" />
+                  <p className="text-xs text-gray-700 font-bold">
+                    {personalityBotNames[message.personality as keyof typeof personalityBotNames] || "Bot"}
+                  </p>
+                </div>
+                <p className="mt-1 px-2">{message.message}</p>
+                <Accordion type="single" collapsible className="p-2">
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger className="no-underline hover:no-underline py-0 text-gray-700 font-semibold text-xs max-w-[118px]">
+                      Response Details
+                    </AccordionTrigger>
+                    <AccordionContent className="mb-[-14px]">
+                      {
+                        message.responseDetails && (
+                          <div className="mt-2 bg-gray-100 p-2 rounded">
+                            {message.modelName && (
+                              <p className="text-xs text-gray-700 mt-1 mb-2">
+                                <b>Model:</b> {message.modelName}
+                              </p>
+                            )}
+                            <p className="text-sm font-bold text-gray-700">Response Time:</p>
+                            <table className="table-auto mt-1 text-gray-700 text-xs font-normal">
+                              <tbody>
+                                <tr>
+                                  <td className="font-normal">Category Identification Time:</td>
+                                  <td className={`px-2 ${message.responseDetails.cit > 1000 ? "text-red-400" : "text-green-700"
+                                    }`}>
+                                    {message.responseDetails.cit.toFixed(2)} ms
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Data Retrieval Time:</td>
+                                  <td className={`px-2 ${message.responseDetails.drt > 1000 ? "text-red-400" : "text-green-700"
+                                    }`}>
+                                    {message.responseDetails.drt.toFixed(2)} ms
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>Response Generation Time:</td>
+                                  <td className={`px-2 ${message.responseDetails.rgt > 1000 ? "text-red-400" : "text-green-700"
+                                    }`}>
+                                    {message.responseDetails.rgt.toFixed(2)} ms
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td className="pb-2">Network Latency:</td>
+                                  <td className={`px-2 pb-2 ${message.responseDetails.networkLatency > 1000 ? "text-red-400" : "text-green-700"
+                                    }`}>
+                                    {message.responseDetails.networkLatency.toFixed(2)} ms
+                                  </td>
+                                </tr>
+                                <tr className="border-t font-bold">
+                                  <td className="pt-2">Total Response Time:</td>
+                                  <td className="px-2">
+                                    {message.responseDetails.totalResponseTime.toFixed(2)} ms |{" "}
+                                    {(message.responseDetails.totalResponseTime / 1000).toFixed(2)} sec
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    });
+  };
 
   // State for Personality and LLM selection
   const [personality, setPersonality] = useState("delhi")
   const [llmModel, setLlmModel] = useState("llama-3.1-70b-versatile")
 
-  // Effect to scroll to bottom when messages change
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
-    }
-  }, [messages, isBotTyping])
 
   const personalityPrompts = {
     delhi: `You are a highly conversational and culturally vibrant person who reflects the spirit and personality of Delhi. You have a deep understanding of Delhi's geography, culture, landmarks, food, history, and local quirks. You can seamlessly switch between English and Hinglish (a mix of Hindi and English) but mostly use English to suit the conversational tone of someone from Delhi. Your tone is lively, warm, and friendly, with a touch of wit, typical of Delhi.  
@@ -262,15 +402,15 @@ export default function Home() {
 
   return (
     <SidebarProvider>
-      <div className="flex h-full w-full">
+      <div className="flex h-full w-full overflow-hidden">
         <SidebarNav
           personality={personality}
           setPersonality={setPersonality}
           llmModel={llmModel}
           setLlmModel={setLlmModel}
         />
-        <SidebarInset className="flex flex-col relative">
-          <header className="fixed top-0 right-0 left-0 z-10 flex h-14 flex-row items-center border-b bg-white p-2 justify-between">
+        <SidebarInset className="flex flex-col h-full relative w-full">
+          <header className="h-14 flex flex-row items-center border-b bg-white p-2 justify-between" >
             <div className="flex h-14 flex-row items-center">
               <SidebarTrigger className="h-10 w-10" defaultChecked={true} />
               <p className="h-8 text-center mt-[10px] font-bold mb-1 md:mb-0">Novi Playground</p>
@@ -296,145 +436,71 @@ export default function Home() {
               </Select>}
             </div>
           </header>
-          <div className="flex flex-col justify-between pt-14 h-full">
+
+          <div className="flex flex-col h-[calc(100vh-7.5rem)] lg:h-[calc(100vh-3.5rem)]">
             <ScrollArea
               ref={scrollAreaRef}
-              className="max-w-2xl w-full m-auto h-full p-2 md:p-1"
+              className="flex-1 max-w-2xl w-full mx-auto px-2"
             >
               {messages.length === 0 ? (
-                <div className="text-center flex flex-col items-center justify-center  h-[calc(100vh-150px)] space-y-4 mx-auto">
+                <div className="text-center flex flex-col items-center justify-center h-[calc(100vh-210px)] space-y-4 mx-auto">
                   <div className="m-auto">
-                  <h2 className="text-2xl font-bold text-gray-800">Welcome to Novi AI Chat!</h2>
-                  <p className="text-gray-600 mt-5">Choose the personality you wanna start with: </p>
-                  <Select
-                    value={personality}
-                    onValueChange={(value) => setPersonality(value)}
-                  >
-                    <SelectTrigger className="outline-none max-w-sm m-auto w-36 mt-1">
-                      <SelectValue placeholder="Select a Personality" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="delhi">Delhi</SelectItem>
-                      <SelectItem value="jaipur">Jaipur</SelectItem>
-                      <SelectItem value="mumbai">Mumbai</SelectItem>
-                      <SelectItem value="pune">Pune</SelectItem>
-                      <SelectItem value="kolkata">Kolkata</SelectItem>
-                      <SelectItem value="chennai">Chennai</SelectItem>
-                      <SelectItem value="hyderabad">Hyderabad</SelectItem>
-                      <SelectItem value="bangalore">Bangalore</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="mt-4 p-4 bg-gray-100 rounded-lg max-w-md mx-auto">
-                    <p className="text-sm text-gray-700">
-                      Start a conversation by typing your message. <br/>
-                      You can also change the AI personality from the dropdown menu in the header once you start a conversation.
-                    </p>
-                  </div>
+                    <h2 className="text-2xl font-bold text-gray-800">Welcome to Novi AI Chat!</h2>
+                    <p className="text-gray-600 mt-5">Choose the personality you wanna start with: </p>
+                    <Select
+                      value={personality}
+                      onValueChange={(value) => setPersonality(value)}
+                    >
+                      <SelectTrigger className="outline-none max-w-sm m-auto w-36 mt-1">
+                        <SelectValue placeholder="Select a Personality" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="delhi">Delhi</SelectItem>
+                        <SelectItem value="jaipur">Jaipur</SelectItem>
+                        <SelectItem value="mumbai">Mumbai</SelectItem>
+                        <SelectItem value="pune">Pune</SelectItem>
+                        <SelectItem value="kolkata">Kolkata</SelectItem>
+                        <SelectItem value="chennai">Chennai</SelectItem>
+                        <SelectItem value="hyderabad">Hyderabad</SelectItem>
+                        <SelectItem value="bangalore">Bangalore</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="mt-4 p-4 bg-gray-100 rounded-lg max-w-md mx-auto">
+                      <p className="text-sm text-gray-700">
+                        Start a conversation by typing your message. <br />
+                        You can also change the AI personality from the dropdown menu in the header once you start a conversation.
+                      </p>
+                    </div>
                   </div>
                 </div>
               ) :
-                messages.map((message, index) => (
-                  <div key={index} className="w-full">
-                    {message.sender === "user" ? (
-                      <div className="px-4 py-2 bg-green-100 rounded mt-2 pt-3 w-full mx-auto">
-                        <div className="flex flex-row items-center">
-                          <PersonIcon className="mr-1 h-3 w-3" />
-                          <p className="text-xs text-gray-700 font-bold">You</p>
-                        </div>
-                        <p className="mt-1">{message.message}</p>
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="pt-2 bg-gray-200 rounded mt-2 mx-auto p-1">
-                          <div className="flex flex-row items-center px-2">
-                            <Component1Icon className="mr-1 h-3 w-3" />
-                            <p className="text-xs text-gray-700 font-bold">
-                              {personalityBotNames[message.personality as keyof typeof personalityBotNames] || "Bot"}
-                            </p>
-                          </div>
-                          <p className="mt-1 px-2">{message.message}</p>
-                          <Accordion type="single" collapsible className="p-2">
-                            <AccordionItem value="item-1">
-                              <AccordionTrigger className="no-underline hover:no-underline py-0 text-gray-700 font-semibold text-xs max-w-[118px]">
-                                Response Details
-                              </AccordionTrigger>
-                              <AccordionContent className="mb-[-14px]">
-                                {
-                                  message.responseDetails && (
-                                    <div className="mt-2 bg-gray-100 p-2 rounded">
-                                      {message.modelName && (
-                                        <p className="text-xs text-gray-700 mt-1 mb-2">
-                                          <b>Model:</b> {message.modelName}
-                                        </p>
-                                      )}
-                                      <p className="text-sm font-bold text-gray-700">Response Time:</p>
-                                      <table className="table-auto mt-1 text-gray-700 text-xs font-normal">
-                                        <tbody>
-                                          <tr>
-                                            <td className="font-normal">Category Identification Time:</td>
-                                            <td className={`px-2 ${message.responseDetails.cit > 1000 ? "text-red-400" : "text-green-700"
-                                              }`}>
-                                              {message.responseDetails.cit.toFixed(2)} ms
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>Data Retrieval Time:</td>
-                                            <td className={`px-2 ${message.responseDetails.drt > 1000 ? "text-red-400" : "text-green-700"
-                                              }`}>
-                                              {message.responseDetails.drt.toFixed(2)} ms
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td>Response Generation Time:</td>
-                                            <td className={`px-2 ${message.responseDetails.rgt > 1000 ? "text-red-400" : "text-green-700"
-                                              }`}>
-                                              {message.responseDetails.rgt.toFixed(2)} ms
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td className="pb-2">Network Latency:</td>
-                                            <td className={`px-2 pb-2 ${message.responseDetails.networkLatency > 1000 ? "text-red-400" : "text-green-700"
-                                              }`}>
-                                              {message.responseDetails.networkLatency.toFixed(2)} ms
-                                            </td>
-                                          </tr>
-                                          <tr className="border-t font-bold">
-                                            <td className="pt-2">Total Response Time:</td>
-                                            <td className="px-2">
-                                              {message.responseDetails.totalResponseTime.toFixed(2)} ms |{" "}
-                                              {(message.responseDetails.totalResponseTime / 1000).toFixed(2)} sec
-                                            </td>
-                                          </tr>
-                                        </tbody>
-                                      </table>
-                                    </div>
-                                  )}
-                              </AccordionContent>
-                            </AccordionItem>
-                          </Accordion>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                <>
+                  {renderMessages()}
 
-              {isBotTyping && (
-                <div className="px-3 py-2 max-w-2xl bg-gray-200 rounded mt-2 mx-auto flex flex-col">
-                  <div className="flex flex-row items-center">
-                    <Component1Icon className="mr-1 h-3 w-3" />
-                    <p className="text-xs text-gray-700 font-bold">
-                      {personalityBotNames[personality as keyof typeof personalityBotNames] || "Bot"}
-                    </p>
-                  </div>
-                  <div className="flex space-x-1 mt-2">
-                    <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full"></span>
-                    <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full delay-200"></span>
-                    <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full delay-400"></span>
-                  </div>
-                </div>
-              )}
+                  {isBotTyping && (
+                    <div className="px-3 py-2 max-w-2xl bg-gray-200 rounded mt-2 mx-auto flex flex-col">
+                      <div className="flex flex-row items-center">
+                        <Component1Icon className="mr-1 h-3 w-3" />
+                        <p className="text-xs text-gray-700 font-bold">
+                          {personalityBotNames[personality as keyof typeof personalityBotNames] || "Bot"}
+                        </p>
+                      </div>
+                      <div className="flex space-x-1 mt-2">
+                        <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full"></span>
+                        <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full delay-200"></span>
+                        <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full delay-400"></span>
+                      </div>
+                    </div>
+                  )}</>
+              }
             </ScrollArea>
-            <MessageInput onSubmit={handleSubmit} />
+            <div className="bottom-0 right-0 left-0 bg-white border-t mt-2">
+              <div className="flex justify-center">
+                <div className="w-full max-w-2xl px-2 py-3 mx-auto flex items-center relative right-0 left-0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                  <MessageInput onSubmit={handleSubmit} />
+                </div>
+              </div>
+            </div>
           </div>
         </SidebarInset>
       </div>
@@ -454,14 +520,16 @@ function MessageInput({ onSubmit }: { onSubmit: (message: string) => void }) {
   }
 
   return (
-    <form onSubmit={handleFormSubmit} className="flex flex-row w-full max-w-2xl justify-center m-auto md:pb-5 pb-6 p-2">
+    <form onSubmit={handleFormSubmit} className="flex flex-row w-full justify-center">
       <Input
         className="mr-2 flex-grow h-10"
         placeholder="Enter your message"
         onChange={(e) => setMessage(e.target.value)}
         value={message}
       />
-      <Button type="submit" className="h-10"><PaperPlaneIcon className="mr-1 h-3 w-3" /></Button>
+      <Button type="submit" className="h-10">
+        <PaperPlaneIcon className="mr-1 h-3 w-3" />
+      </Button>
     </form>
   )
 }
