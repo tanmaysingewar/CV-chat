@@ -437,10 +437,10 @@ export default function Home() {
             </div>
           </header>
 
-          <div className="flex flex-col h-[calc(100vh-7.5rem)] lg:h-[calc(100vh-3.5rem)]">
+          <div className="flex flex-col h-[calc(100vh-4.5rem)] lg:h-[calc(100vh-3.5rem)]">
             <ScrollArea
               ref={scrollAreaRef}
-              className="flex-1 max-w-2xl w-full mx-auto px-2"
+              className="flex-1 max-w-2xl w-full mx-auto px-2 mb-[70px]"
             >
               {messages.length === 0 ? (
                 <div className="text-center flex flex-col items-center justify-center h-[calc(100vh-210px)] space-y-4 mx-auto">
@@ -494,7 +494,7 @@ export default function Home() {
                   )}</>
               }
             </ScrollArea>
-            <div className="bottom-0 right-0 left-0 bg-white border-t mt-2">
+            <div className="bottom-0 right-0 left-0 bg-white border-t mt-2 fixed">
               <div className="flex justify-center">
                 <div className="w-full max-w-2xl px-2 py-3 mx-auto flex items-center relative right-0 left-0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                   <MessageInput onSubmit={handleSubmit} />
