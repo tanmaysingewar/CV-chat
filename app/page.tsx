@@ -263,7 +263,7 @@ export default function Home() {
           setLlmModel={setLlmModel}
         />
         <SidebarInset className="flex flex-col">
-          <div className="flex flex-col justify-between m-auto w-full h-screen">
+          <div className="flex flex-col justify-between m-auto w-full h-full">
             <header className="flex h-14 flex-row items-center border-b p-2">
               <SidebarTrigger className="h-8 w-8" />
               <p className="h-8 text-center mt-[10px] font-bold ml-4">Novi Playground</p>
