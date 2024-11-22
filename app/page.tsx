@@ -535,8 +535,6 @@ function MessageInput({ onSubmit }: { onSubmit: (message: string) => void }) {
 }
 
 function SidebarNav({
-  personality,
-  setPersonality,
   llmModel,
   setLlmModel
 }: {
