@@ -494,7 +494,7 @@ export default function Home() {
                   )}</>
               }
             </ScrollArea>
-            <div className="bottom-0 right-0 left-0 bg-white border-t mt-2 fixed">
+            <div className="bottom-0 right-0 left-0 bg-white border-t mt-2 fixed md:relative">
               <div className="flex justify-center">
                 <div className="w-full max-w-2xl px-2 py-3 mx-auto flex items-center relative right-0 left-0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                   <MessageInput onSubmit={handleSubmit} />
