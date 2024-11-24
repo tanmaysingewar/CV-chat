@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Component1Icon, PersonIcon, PaperPlaneIcon } from "@radix-ui/react-icons"
+import { PaperPlaneIcon } from "@radix-ui/react-icons"
 import { useState, useRef, useEffect, useCallback } from "react"
 
 import {
