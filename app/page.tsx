@@ -517,9 +517,10 @@ export default function Home() {
           </div>
           {/* Make first letter capital */}
           {messages.length != 0 && <p className="h-8 text-center mt-[9px] md:mt-[6px] font-bold mb-1 md:mb-0 text-lg">{personality.charAt(0).toUpperCase() + personality.slice(1)} Bot</p>}
+          {messages.length != 0 &&
           <Button className="" onClick={() => newChat()}>
             <p>New Chat</p>
-          </Button>
+          </Button>}
         </header>
         <ScrollArea
           className="flex-1 max-w-2xl w-full mx-auto px-2 md:mb-0"
