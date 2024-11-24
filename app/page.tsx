@@ -9,7 +9,6 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
