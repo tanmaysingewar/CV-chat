@@ -141,8 +141,7 @@ export default function Home() {
 
   // State for Personality and LLM selection
   const [personality, setPersonality] = useState("delhi")
-  const [llmModel, setLlmModel] = useState("meta-llama/llama-3.1-70b-instruct")
-  setLlmModel("meta-llama/llama-2-7b-chat-hf")
+  // const [llmModel, setLlmModel] = useState("meta-llama/llama-3.1-70b-instruct")
 
   const personalityPrompts = {
     delhi: `
@@ -439,7 +438,7 @@ export default function Home() {
           },
           body: JSON.stringify({
             question: message,
-            llm: llmModel,
+            llm: "meta-llama/llama-3.1-70b-instruct",
             personality: personality,
             personality_prompt: personalityPrompts[personality as keyof typeof personalityPrompts] || personalityPrompts.delhi,
             last_three_responses: lastThreeResponses,
@@ -465,7 +464,7 @@ export default function Home() {
           {
             message: data.response || "Sorry, I didn't understand that.",
             sender: "bot",
-            modelName: llmModel,  // Add this line
+            modelName: "meta-llama/llama-3.1-70b-instruct",  // Add this line
             personality: personality,  // Add this line
             conversationId,
             responseDetails: {
@@ -517,7 +516,7 @@ export default function Home() {
             <p className="text-center font-bold text-lg ">Novi Playground</p>
           </div>
           {/* Make first letter capital */}
-          <p className="h-8 text-center mt-[9px] md:mt-[6px] font-bold mb-1 md:mb-0 text-lg">{personality.charAt(0).toUpperCase() + personality.slice(1)} Bot</p>
+          {messages.length != 0 && <p className="h-8 text-center mt-[9px] md:mt-[6px] font-bold mb-1 md:mb-0 text-lg">{personality.charAt(0).toUpperCase() + personality.slice(1)} Bot</p>}
           <Button className="" onClick={() => newChat()}>
             <p>New Chat</p>
           </Button>
