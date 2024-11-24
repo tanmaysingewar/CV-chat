@@ -12,6 +12,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetTrigger,
 } from "@/components/ui/sheet"
 
 import {
@@ -21,6 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { PanelLeftIcon } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
 
 export default function Home() {
   // State for messages
@@ -126,7 +129,6 @@ export default function Home() {
           )}
           {isBotTyping && isLastMessage && (
             <div className={`px-4 mt-3 max-w-lg mr-auto w-fit h-10`}>
-
               <div className="flex space-x-1 mt-auto justify-center items-center mx-auto">
                 <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full"></span>
                 <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full delay-200"></span>
@@ -143,7 +145,7 @@ export default function Home() {
   const [personality, setPersonality] = useState("delhi")
   // const [llmModel, setLlmModel] = useState("meta-llama/llama-3.1-70b-instruct")
 
-  const personalityPrompts = {
+  const [editablePrompts, setEditablePrompts] = useState<{[key: string]: string}>({
     delhi: `
     ## Instructions:
       - You are a vibrant, culturally sophisticated conversationalist with the soul of a philosopher, embodying the lively and warm personality of Delhi.
@@ -373,7 +375,8 @@ export default function Home() {
       - Philosopher.  
 
     - **Reply to user questions only in English and respond in one or two lines.**  `,
-  };
+   // ... other city prompts
+  });
 
   // const personalityBotNames = {
   //   delhi: "Delhi Bot",
@@ -440,7 +443,7 @@ export default function Home() {
             question: message,
             llm: "meta-llama/llama-3.1-70b-instruct",
             personality: personality,
-            personality_prompt: personalityPrompts[personality as keyof typeof personalityPrompts] || personalityPrompts.delhi,
+            personality_prompt: editablePrompts[personality],
             last_three_responses: lastThreeResponses,
             conversationId
           }),
@@ -498,25 +501,64 @@ export default function Home() {
     setPersonality("delhi");
   }
 
+    // Handler for prompt editing
+    const handlePromptEdit = (value: string) => {
+      setEditablePrompts(prev => ({
+        ...prev,
+        [personality]: value
+      }));
+    };
+
   return (
     <div className="flex flex-col w-full h-dvh">
       <Sheet>
-        <SheetContent side={"left"} className="p-2">
+      <SheetContent side={"left"} className="min-w-full p-2">
           <SheetHeader>
-            <SheetTitle></SheetTitle>
-            <SheetDescription>
-            </SheetDescription>
+            <SheetTitle className="text-center">Edit Prompt</SheetTitle>
           </SheetHeader>
+          <div className="mt-2 flex flex-row items-center justify-end">
+            <div className="flex flex-row items-center justify-center mb-2">
+              <Select
+                value={personality}
+                onValueChange={(value) => setPersonality(value)}
+              >
+                <SelectTrigger className="outline-none max-w-sm m-auto w-36">
+                  <SelectValue placeholder="Select a Personality" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="delhi">Delhi</SelectItem>
+                  <SelectItem value="jaipur">Jaipur</SelectItem>
+                  <SelectItem value="mumbai">Mumbai</SelectItem>
+                  <SelectItem value="pune">Pune</SelectItem>
+                  <SelectItem value="kolkata">Kolkata</SelectItem>
+                  <SelectItem value="chennai">Chennai</SelectItem>
+                  <SelectItem value="hyderabad">Hyderabad</SelectItem>
+                  <SelectItem value="bangalore">Bangalore</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div>
+            <Textarea 
+              placeholder="Enter your message" 
+              className="h-[300px]" 
+              value={editablePrompts[personality]} 
+              onChange={(e) => handlePromptEdit(e.target.value)}
+            />
+            <p className="text-sm mt-2 font-bold text-red-500">
+              Note: Your edited prompt will notbe saved it will active only for this session.If you reload the page, your changes will be lost.
+            </p>
+          </div>
         </SheetContent>
         <header className="h-14 flex flex-row items-center border-b bg-white p-2 justify-between md:justify-between" >
-          <div className=" flex-row items-center hidden md:block">
-            {/* <SheetTrigger>
+          <div className="flex-row items-center flex">
+            <SheetTrigger>
               <PanelLeftIcon className="h-6 w-6" />
-            </SheetTrigger> */}
-            <p className="text-center font-bold text-lg ">Novi Playground</p>
+            </SheetTrigger>
+            <p className="text-center font-bold text-lg ml-2 hidden md:block">Novi Playground</p>
           </div>
           {/* Make first letter capital */}
-          {messages.length != 0 && <p className="h-8 text-center mt-[9px] md:mt-[6px] font-bold mb-1 md:mb-0 text-lg">{personality.charAt(0).toUpperCase() + personality.slice(1)} Bot</p>}
+          {messages.length != 0 && <p className="h-8 text-center mt-[9px] md:mt-[6px] font-bold mb-1 md:mb-0 text-lg ">{personality.charAt(0).toUpperCase() + personality.slice(1)} Bot</p>}
           {messages.length != 0 &&
           <Button className="" onClick={() => newChat()}>
             <p>New Chat</p>
