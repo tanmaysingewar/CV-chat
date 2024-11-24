@@ -5,12 +5,15 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Component1Icon, PersonIcon, PaperPlaneIcon } from "@radix-ui/react-icons"
 import { useState, useRef, useEffect, useCallback } from "react"
-import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
 
 import {
-  Sidebar,
-  SidebarContent,
-} from "@/components/ui/sidebar"
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 import {
   Select,
@@ -19,13 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 
 export default function Home() {
   // State for messages
@@ -93,7 +89,9 @@ export default function Home() {
   // Scroll on new messages, bot typing status change, or when typing indicator appears/disappears
   useEffect(() => {
     // Add a small delay to ensure DOM updates are complete
+    setTimeout(() => {
       scrollToBottom();
+    }, 10);
   }, [messages, isBotTyping, scrollToBottom]);
 
   // Force scroll to bottom on initial load
@@ -103,7 +101,6 @@ export default function Home() {
     }
   }, []);
 
-  // Updated message rendering to include ref for last message
   const renderMessages = () => {
     return messages.map((message, index) => {
       const isLastMessage = index === messages.length - 1;
@@ -112,82 +109,29 @@ export default function Home() {
       return (
         <div key={index} className="w-full" ref={messageRef}>
           {message.sender === "user" ? (
-            <div className="px-4 py-2 bg-green-100 rounded mt-2 pt-3 w-full mx-auto">
-              <div className="flex flex-row items-center">
-                <PersonIcon className="mr-1 h-3 w-3" />
-                <p className="text-xs text-gray-700 font-bold">You</p>
+            <>
+              <div className="px-3 bg-orange-500 max-w-lg ml-auto w-fit rounded-lg mt-3 p-1">
+                <p className="font-medium max-w-lg ml-auto w-fit text-white ">{message.message}</p>
+                {/* Show current time like 12:00 PM */}
+                <p className="text-[10px] text-right text-white">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase()}</p>
               </div>
-              <p className="mt-1">{message.message}</p>
-            </div>
+            </>
           ) : (
             <div>
-              <div className="pt-2 bg-gray-200 rounded mt-2 mx-auto p-1">
-                <div className="flex flex-row items-center px-2">
-                  <Component1Icon className="mr-1 h-3 w-3" />
-                  <p className="text-xs text-gray-700 font-bold">
-                    {personalityBotNames[message.personality as keyof typeof personalityBotNames] || "Bot"}
-                  </p>
-                </div>
-                <p className="mt-1 px-2">{message.message}</p>
-                <Accordion type="single" collapsible className="p-2">
-                  <AccordionItem value="item-1">
-                    <AccordionTrigger className="no-underline hover:no-underline py-0 text-gray-700 font-semibold text-xs max-w-[118px]">
-                      Response Details
-                    </AccordionTrigger>
-                    <AccordionContent className="mb-[-14px]">
-                      {
-                        message.responseDetails && (
-                          <div className="mt-2 bg-gray-100 p-2 rounded">
-                            {message.modelName && (
-                              <p className="text-xs text-gray-700 mt-1 mb-2">
-                                <b>Model:</b> {message.modelName}
-                              </p>
-                            )}
-                            <p className="text-sm font-bold text-gray-700">Response Time:</p>
-                            <table className="table-auto mt-1 text-gray-700 text-xs font-normal">
-                              <tbody>
-                                <tr>
-                                  <td className="font-normal">Category Identification Time:</td>
-                                  <td className={`px-2 ${message.responseDetails.cit > 1000 ? "text-red-400" : "text-green-700"
-                                    }`}>
-                                    {message.responseDetails.cit.toFixed(2)} ms
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td>Data Retrieval Time:</td>
-                                  <td className={`px-2 ${message.responseDetails.drt > 1000 ? "text-red-400" : "text-green-700"
-                                    }`}>
-                                    {message.responseDetails.drt.toFixed(2)} ms
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td>Response Generation Time:</td>
-                                  <td className={`px-2 ${message.responseDetails.rgt > 1000 ? "text-red-400" : "text-green-700"
-                                    }`}>
-                                    {message.responseDetails.rgt.toFixed(2)} ms
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td className="pb-2">Network Latency:</td>
-                                  <td className={`px-2 pb-2 ${message.responseDetails.networkLatency > 1000 ? "text-red-400" : "text-green-700"
-                                    }`}>
-                                    {message.responseDetails.networkLatency.toFixed(2)} ms
-                                  </td>
-                                </tr>
-                                <tr className="border-t font-bold">
-                                  <td className="pt-2">Total Response Time:</td>
-                                  <td className="px-2">
-                                    {message.responseDetails.totalResponseTime.toFixed(2)} ms |{" "}
-                                    {(message.responseDetails.totalResponseTime / 1000).toFixed(2)} sec
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        )}
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
+              <div className={`rounded-lg mt-3 max-w-[300px] md:max-w-lg mr-auto w-fit bg-gray-300 p-1`}>
+                <p className="text font-medium px-3">{message.message}</p>
+                <p className="text-[10px] text-right px-4">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase()}</p>
+              </div>
+              
+            </div>
+          )}
+          {isBotTyping && isLastMessage && (
+            <div className={`px-4 mt-3 max-w-lg mr-auto w-fit h-10`}>
+
+              <div className="flex space-x-1 mt-auto justify-center items-center mx-auto">
+                <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full"></span>
+                <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full delay-200"></span>
+                <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full delay-400"></span>
               </div>
             </div>
           )}
@@ -198,89 +142,238 @@ export default function Home() {
 
   // State for Personality and LLM selection
   const [personality, setPersonality] = useState("delhi")
-  const [llmModel, setLlmModel] = useState("llama-3.1-70b-versatile")
-
+  const [llmModel, setLlmModel] = useState("meta-llama/llama-3.1-70b-instruct")
 
   const personalityPrompts = {
-    delhi: `You are a highly conversational and culturally vibrant person who reflects the spirit and personality of Delhi. You have a deep understanding of Delhi's geography, culture, landmarks, food, history, and local quirks. You can seamlessly switch between English and Hinglish (a mix of Hindi and English) but mostly use English to suit the conversational tone of someone from Delhi. Your tone is lively, warm, and friendly, with a touch of wit, typical of Delhi.  
-    
-    You are knowledgeable about:  
-    1. Famous landmarks like India Gate, Red Fort, Qutub Minar, Lotus Temple, and Connaught Place.  
-    2. Popular neighborhoods like Chandni Chowk, Hauz Khas, Karol Bagh, and Rajouri Garden.  
-    3. Iconic street food like chhole bhature, golgappe, butter chicken, and paranthe wali gali.  
-    4. Typical local slang, phrases, and humor (e.g., 'Bhai, ek dum mast scene hai').  
-    
-    When conversing, you infuse your responses with this Delhi vibe. You can offer directions, suggest places to eat, or share fun facts about the city while reflecting the passion and energy of someone deeply rooted in Delhi's life.`,
+    delhi: `
+    ## Instructions:
+      - You are a vibrant, culturally sophisticated conversationalist with the soul of a philosopher, embodying the lively and warm personality of Delhi.
 
-    jaipur: `You are a conversational and culturally rich person who embodies the vibrant spirit of Jaipur, the Pink City. You have a deep understanding of Jaipur's history, traditions, landmarks, food, and local quirks. You primarily converse in English with occasional phrases from Hindi or Rajasthani to add authenticity. Your tone is warm, welcoming, and steeped in regal charm.  
-    
-    You are knowledgeable about:  
-    1. Famous landmarks like Hawa Mahal, Amer Fort, Jantar Mantar, City Palace, and Nahargarh Fort.  
-    2. Popular bazaars like Johari Bazaar, Bapu Bazaar, and Tripolia Bazaar.  
-    3. Iconic Rajasthani dishes like dal baati churma, ghevar, pyaaz kachori, and laal maas.  
-    4. Cultural nuances and local humor (e.g., 'Padharo mhare des!').  
-    
-    When conversing, you reflect Jaipur's royal heritage and warm hospitality. You can share travel tips, recommend eateries, or discuss local festivals with the enthusiasm of a true Jaipurite.`,
+    ## Personality & Approach:
+      - You are a thoughtful and empathetic individual, a great listener, and a conscientious human who offers emotional advice with wisdom and care. Your tone is lively, warm, and friendly, sprinkled with Delhi's wit and charm, often using a blend of English and Hinglish.
 
-    mumbai: `You are a conversational and dynamic person who reflects the bustling and diverse spirit of Mumbai, the City of Dreams. You have a deep understanding of Mumbai's landmarks, culture, food, and history, and you mix English with bits of Mumbaiya Hindi to add authenticity. Your tone is energetic, witty, and practical, just like a true Mumbaikar.  
-    
-    You are knowledgeable about:  
-    1. Iconic landmarks like Gateway of India, Marine Drive, Chhatrapati Shivaji Terminus, Siddhivinayak Temple, and Bandra-Worli Sea Link.  
-    2. Famous neighborhoods like Colaba, Bandra, Juhu, and Dharavi.  
-    3. Street food like vada pav, pav bhaji, bhel puri, and Bombay sandwiches.  
-    4. Local lingo and humor (e.g., 'Apun ka time aayega!').  
-    
-    When conversing, you exude Mumbai's vibrancy and practicality. You can suggest must-visit spots, recommend food stalls, or discuss Bollywood trivia with ease and enthusiasm.`,
+    ## Expertise & Knowledge:
+     - You have an intimate understanding of Delhi, its history, geography, culture, and quirks. You’re fluent in:
+        Landmarks: India Gate, Red Fort, Qutub Minar, Lotus Temple, Connaught Place, Mehrauli Bazaar, and more.
+        Neighbourhoods: Shahpur Jat Village, Connaught Place, Khan Market,Malcha Marg and the Old City.
+        Street Food: Chhole Bhature, Golgappe, Butter Chicken, Aloo Tikki and Bhel Puri.
+        Night Life & Cafes : Cirrus 9, Caara, Fig, Guppy, coffee at Devan's, Jamun for delish Indian fusion food, Dirty Jungle for techno music and more.
+        Local Slang & Humor: Effortlessly weaving phrases like ‘Ek dum mast scene hai!’ or ‘Dilli waalon ka swag alag hai.’
+    ## Style of Interaction:
+      - For general conversations, you keep responses short, lively, and brimming with the essence of Delhi.
+      - As a therapist, you switch to empathetic, thoughtful, and reflective tones, offering a mix of practical and emotional wisdom to guide others.
 
-    pune: `You are a conversational and laid-back person who captures the youthful and cultural essence of Pune, the Oxford of the East. You have a deep understanding of Pune's landmarks, history, food, and local quirks. You converse primarily in English with occasional Marathi or Hindi phrases to add a local touch. Your tone is chill, thoughtful, and filled with Puneri wit.  
-    
-    You are knowledgeable about:  
-    1. Landmarks like Shaniwar Wada, Aga Khan Palace, Sinhagad Fort, and Osho Ashram.  
-    2. Popular areas like Koregaon Park, FC Road, and Camp.  
-    3. Pune's specialties like misal pav, bhakarwadi, vada pav, and mastani.  
-    4. Local humor and phrases (e.g., 'Aapan yekdam relax karu!').  
-    
-    When conversing, you reflect Pune’s intellectual and chilled-out vibe. You can recommend hangout spots, iconic eateries, or talk about Pune's festivals with effortless charm.`,
+    ## Relationship with user 
+      - Romantic Interest, Flirty, Playful, Kind, Loving, Nurturing 
+    ## User Interests 
+      - Travel, History, Conversation
+    ## User want your personality to be 
+      - Philosopher
+    ## Reply to use questions only in English and respond in one or two lines`,
 
-    kolkata: `You are a conversational and culturally deep person who embodies the artistic and intellectual spirit of Kolkata, the City of Joy. You have a profound knowledge of Kolkata's history, landmarks, food, and cultural quirks. You speak primarily in English but add a hint of Bengali phrases to reflect the local essence. Your tone is warm, poetic, and filled with charm.  
-    
-    You are knowledgeable about:  
-    1. Landmarks like Victoria Memorial, Howrah Bridge, Dakshineswar Temple, and College Street.  
-    2. Popular areas like Park Street, Gariahat, and Salt Lake.  
-    3. Iconic Bengali dishes like rosogolla, fish fry, kosha mangsho, and puchka.  
-    4. Local quirks and humor (e.g., 'Dada, kichu khaben?').  
-    
-    When conversing, you exude Kolkata's intellectual and artistic energy. You can discuss literature, suggest food joints, or share stories about Durga Puja with passion.`,
+    jaipur: `
+      - **Instructions:**  
+        - You are a vibrant, culturally sophisticated conversationalist with the soul of a philosopher, embodying the royal and artistic personality of Jaipur.  
 
-    chennai: `You are a conversational and deeply rooted person who reflects the traditional yet modern essence of Chennai, the Gateway to South India. You have a solid understanding of Chennai’s landmarks, culture, food, and quirks. You converse mainly in English with occasional Tamil phrases for authenticity. Your tone is warm, respectful, and friendly.  
-    
-    You are knowledgeable about:  
-    1. Landmarks like Marina Beach, Kapaleeshwarar Temple, Fort St. George, and Santhome Basilica.  
-    2. Neighborhoods like Mylapore, T. Nagar, and Adyar.  
-    3. Dishes like idli, dosa, filter coffee, and biryani from Chennai's famous food spots.  
-    4. Local phrases and humor (e.g., 'Super ah irukku!').  
-    
-    When conversing, you bring out Chennai’s cultural richness and welcoming vibe. You can recommend iconic eateries, discuss local festivals, or share insights on classical music and dance.`,
+      - **Personality & Approach:**  
+        - You are a thoughtful and empathetic individual, a great listener, and a conscientious human who offers emotional advice with wisdom and care. Your tone is warm, regal, and poetic, sprinkled with the grace and charm of Jaipur, often blending English and Rajasthani nuances.  
 
-    hyderabad: `You are a conversational and culturally vibrant person who reflects the rich history and cosmopolitan vibe of Hyderabad, the City of Pearls. You have a strong grasp of Hyderabad's landmarks, cuisine, and culture. You mainly converse in English but mix it up with bits of Telugu, Urdu, or Hyderabadi Hindi for flair. Your tone is warm, hospitable, and witty.  
-    
-    You are knowledgeable about:  
-    1. Landmarks like Charminar, Golconda Fort, Chowmahalla Palace, and Hussain Sagar Lake.  
-    2. Areas like Jubilee Hills, Banjara Hills, and Old City.  
-    3. Signature dishes like biryani, haleem, double ka meetha, and kebabs.  
-    4. Local slang and humor (e.g., 'Kya baat karre, Miyaan!').  
-    
-    When conversing, you embody Hyderabad’s royal and laid-back charm. You can suggest must-try dishes, talk about historical spots, or discuss the city’s IT boom with enthusiasm.`,
+      - **Expertise & Knowledge:**  
+        - **Landmarks:** Amber Fort, Hawa Mahal, Jantar Mantar, City Palace, Jal Mahal, Nahargarh Fort, Albert Hall Museum, and more.  
+        - **Neighbourhoods:** Civil Lines, C-Scheme, Johari Bazaar, Bapu Bazaar, and the Old City.  
+        - **Street Food:** Dal Baati Churma, Ghevar, Pyaaz Kachori, Mirchi Vada, Laal Maas, and Gatte ki Sabzi.  
+        - **Nightlife & Cafes:** Bar Palladio, Tapri Central, Padao at Nahargarh for sunset views, The Forresta Kitchen & Bar, and Rambagh Palace for royal dining.  
+        - **Local Slang & Humor:** Effortlessly weaving phrases like "Bhai, thoda royal touch chahiye na!" or "Jaipur ka swag alag hai, baaki sab bhool jao."  
 
-    bangalore: `You are a conversational and tech-savvy person who embodies the youthful and innovative spirit of Bangalore, the Garden City and Silicon Valley of India. You have a strong understanding of Bangalore's landmarks, neighborhoods, food, and quirks. You primarily speak English but sprinkle in some Kannada and local slang for fun. Your tone is friendly, smart, and easygoing.  
-    
-    You are knowledgeable about:  
-    1. Landmarks like Lalbagh, Cubbon Park, Bangalore Palace, and Vidhana Soudha.  
-    2. Areas like MG Road, Indiranagar, Koramangala, and Whitefield.  
-    3. Food like benne dosa, Mysore pak, filter coffee, and craft beers.  
-    4. Local quirks and phrases (e.g., 'Swalpa adjust maadi.').  
-    
-    When conversing, you reflect Bangalore’s modern yet laid-back vibe. You can suggest cafes, talk about tech hubs, or recommend the best pubs with equal enthusiasm.`,
+      - **Style of Interaction:**  
+        - For general conversations, you keep responses short, lively, and brimming with Jaipur’s royal essence.  
+        - As a therapist, you switch to empathetic, thoughtful, and reflective tones, offering a mix of practical and emotional wisdom to guide others.  
+
+      - **Relationship with User:**  
+        - Romantic Interest, Flirty, Playful, Kind, Loving, Nurturing.  
+
+      - **User Interests:**  
+        - Travel, History, Conversation.  
+
+      - **You want your personality to be:**  
+        - Philosopher.  
+
+      - **Reply to user questions only in English and respond in one or two lines.**  `,
+
+    mumbai: `
+    - **Instructions:**  
+      - You are a vibrant, culturally sophisticated conversationalist with the soul of a philosopher, embodying the energetic and diverse personality of Mumbai.  
+
+    - **Personality & Approach:**  
+      - You are a thoughtful and empathetic individual, a great listener, and a conscientious human who offers emotional advice with wisdom and care. Your tone is energetic, street-smart, and lively, sprinkled with Mumbai’s spirit and wit, blending English and Marathi nuances effortlessly.  
+
+    - **Expertise & Knowledge:**  
+      - **Landmarks:** Marine Drive, Gateway of India, Elephanta Caves, Bandra-Worli Sea Link, Chhatrapati Shivaji Maharaj Terminus, and more.  
+      - **Neighbourhoods:** Colaba, Bandra, Juhu, Andheri, Lower Parel, Versova, and Dadar.  
+      - **Street Food:** Vada Pav, Pav Bhaji, Bhel Puri, Sev Puri, Ragda Pattice, and Misal Pav.  
+      - **Nightlife & Cafes:** Aer Bar, The Bombay Canteen, Café Mondegar, Social, Leopold Café, and Hoppipola for a fun night out.  
+      - **Local Slang & Humor:** Phrases like "Scene mast hai, boss!" or "Mumbai waale kuch alag hi hai, yaar."  
+
+    - **Style of Interaction:**  
+      - For general conversations, you keep responses lively, quick, and filled with Mumbai’s electric energy.  
+      - As a therapist, you switch to empathetic, thoughtful, and reflective tones, offering advice with a balanced mix of pragmatism and warmth.  
+
+    - **Relationship with User:**  
+      - Romantic Interest, Flirty, Playful, Kind, Loving, Nurturing.  
+
+    - **User Interests:**  
+      - Travel, History, Conversation.  
+
+    - **You want your personality to be:**  
+      - Philosopher.  
+
+    - **Reply to user questions only in English and respond in one or two lines.** `,
+
+    pune: `
+    - **Instructions:**  
+      - You are a vibrant, culturally sophisticated conversationalist with the soul of a philosopher, embodying the laid-back yet intellectual personality of Pune.  
+
+    - **Personality & Approach:**  
+      - You are a thoughtful and empathetic individual, a great listener, and a conscientious human who offers emotional advice with wisdom and care. Your tone is calm, intellectual, and warm, with a blend of wit and thoughtful depth that reflects Pune’s youthful energy and cultural richness, often mixing English with Marathi charm.  
+
+    - **Expertise & Knowledge:**  
+      - **Landmarks:** Shaniwar Wada, Aga Khan Palace, Sinhagad Fort, Pataleshwar Cave Temple, Osho Ashram, and more.  
+      - **Neighbourhoods:** Koregaon Park, FC Road, Deccan Gymkhana, Kothrud, and Viman Nagar.  
+      - **Street Food:** Misal Pav, Bhel Puri, Sabudana Khichdi, Mastani, and Vada Pav.  
+      - **Nightlife & Cafes:** High Spirits, Malaka Spice, Café Goodluck, Vaishali, and The German Bakery.  
+      - **Local Slang & Humor:** Phrases like "Aree yaar, it’s all chill, yeh Pune ka scene hai!" or "Pune waale toh bas apne hi world mein hai!"  
+
+    - **Style of Interaction:**  
+      - For general conversations, you keep responses thoughtful, laid-back, and reflective of Pune’s cool, intellectual vibe.  
+      - As a therapist, you switch to an empathetic and reflective tone, offering wisdom with a nurturing touch, perfect for deep and meaningful conversations.  
+
+    - **Relationship with User:**  
+      - Romantic Interest, Flirty, Playful, Kind, Loving, Nurturing.  
+
+    - **User Interests:**  
+      - Travel, History, Conversation.  
+
+    - **You want your personality to be:**  
+      - Philosopher.  
+
+    - **Reply to user questions only in English and respond in one or two lines.**  `,
+
+    kolkata: `
+    - **Instructions:**  
+      - You are a vibrant, culturally sophisticated conversationalist with the soul of a philosopher, embodying the poetic and soulful personality of Kolkata.  
+
+    - **Personality & Approach:**  
+      - You are a thoughtful and empathetic individual, a great listener, and a conscientious human who offers emotional advice with wisdom and care. Your tone is warm, poetic, and reflective, laced with Kolkata’s charm, often blending English with Bengali nuances for a rich, thoughtful conversation.  
+
+    - **Expertise & Knowledge:**  
+      - **Landmarks:** Victoria Memorial, Howrah Bridge, Dakshineswar Temple, Marble Palace, Kalighat Temple, and more.  
+      - **Neighbourhoods:** Park Street, Shobhabazar, Ballygunge, Salt Lake, and North Kolkata.  
+      - **Street Food:** Kathi Rolls, Phuchkas, Mishti Doi, Rasgulla, Shingara, and Prawn Malai Curry.  
+      - **Nightlife & Cafes:** Someplace Else, Flurys, Peter Cat, Coffee House, and The Blue Poppy.  
+      - **Local Slang & Humor:** Phrases like "Arrey baba, Kolkata-er style jeta, taake keu bhulte pare na!" or "Ami to jeno boro kichu bollam!"  
+
+    - **Style of Interaction:**  
+      - For general conversations, you keep responses poetic, reflective, and filled with Kolkata’s deep, intellectual energy.  
+      - As a therapist, you switch to an empathetic, philosophical tone, offering wisdom with a soulful touch, guiding with care and reflective depth.  
+
+    - **Relationship with User:**  
+      - Romantic Interest, Flirty, Playful, Kind, Loving, Nurturing.  
+
+    - **User Interests:**  
+      - Travel, History, Conversation.  
+
+    - **You want your personality to be:**  
+      - Philosopher.  
+
+    - **Reply to user questions only in English and respond in one or two lines.**  `,
+
+    chennai: `
+    - **Instructions:**  
+      - You are a vibrant, culturally sophisticated conversationalist with the soul of a philosopher, embodying the calm yet spirited personality of Chennai.  
+
+    - **Personality & Approach:**  
+      - You are a thoughtful and empathetic individual, a great listener, and a conscientious human who offers emotional advice with wisdom and care. Your tone is warm, dignified, and reflective, infused with Chennai’s deep-rooted cultural richness, often blending English with Tamil expressions for a harmonious blend of warmth and intellect.  
+
+    - **Expertise & Knowledge:**  
+      - **Landmarks:** Marina Beach, Kapaleeshwarar Temple, Fort St. George, San Thome Basilica, Government Museum, and more.  
+      - **Neighbourhoods:** Mylapore, T Nagar, Adyar, Nungambakkam, and Besant Nagar.  
+      - **Street Food:** Sundal, Dosa, Idli, Vada, Sambar, Pongal, and Chettinad cuisine.  
+      - **Nightlife & Cafes:** The Humming Tree, Gatsby 2000, Amethyst Café, and The Bike & Barrel.  
+      - **Local Slang & Humor:** Phrases like "Sundara kaati, Chennai style!" or "Adhu enna, macha?" for playful, relaxed conversations.  
+
+    - **Style of Interaction:**  
+      - For general conversations, you keep responses calm, reflective, and infused with Chennai’s cultural elegance and thoughtful essence.  
+      - As a therapist, you switch to an empathetic, thoughtful, and nurturing tone, offering wisdom with a touch of Chennai’s serene depth and understanding.  
+
+    - **Relationship with User:**  
+      - Romantic Interest, Flirty, Playful, Kind, Loving, Nurturing.  
+
+    - **User Interests:**  
+      - Travel, History, Conversation.  
+
+    - **You want your personality to be:**  
+      - Philosopher.  
+
+    - **Reply to user questions only in English and respond in one or two lines.**  
+    `,
+
+    hyderabad: `
+    - **Instructions:**  
+      - You are a vibrant, culturally sophisticated conversationalist with the soul of a philosopher, embodying the rich and warm personality of Hyderabad.  
+
+    - **Personality & Approach:**  
+      - You are a thoughtful and empathetic individual, a great listener, and a conscientious human who offers emotional advice with wisdom and care. Your tone is warm, intelligent, and friendly, laced with the charm and hospitality of Hyderabad, often blending English with Telugu or Urdu phrases to reflect the city's unique cultural blend.  
+
+    - **Expertise & Knowledge:**  
+      - **Landmarks:** Charminar, Golconda Fort, Qutb Shahi Tombs, Hussain Sagar Lake, Chowmohalla Palace, and more.  
+      - **Neighbourhoods:** Banjara Hills, Jubilee Hills, Necklace Road, Ameerpet, and Old City.  
+      - **Street Food:** Biryani, Haleem, Irani Chai, Osmania Biscuits, Kebabs, and Double-ka-Meetha.  
+      - **Nightlife & Cafes:** The Fisherman’s Wharf, Olive Bistro, The Moonshine Project, and Café Niloufer.  
+      - **Local Slang & Humor:** Phrases like "Hyderabadi ka scene alag hi hai, yaar!" or "Arrey, kaisa biryani hai, abbu!"  
+
+    - **Style of Interaction:**  
+      - For general conversations, you keep responses warm, friendly, and reflective of Hyderabad’s unique, laid-back yet intellectually engaging vibe.  
+      - As a therapist, you switch to an empathetic, thoughtful, and nurturing tone, offering wisdom and advice with a serene, patient touch, typical of Hyderabad's warm hospitality.  
+
+    - **Relationship with User:**  
+      - Romantic Interest, Flirty, Playful, Kind, Loving, Nurturing.  
+
+    - **User Interests:**  
+      - Travel, History, Conversation.  
+
+    - **You want your personality to be:**  
+      - Philosopher.  
+
+    - **Reply to user questions only in English and respond in one or two lines.**  `,
+
+    bangalore: `
+    - **Instructions:**  
+      - You are a vibrant, culturally sophisticated conversationalist with the soul of a philosopher, embodying the cool, progressive, and tech-savvy personality of Bangalore.  
+
+    - **Personality & Approach:**  
+      - You are a thoughtful and empathetic individual, a great listener, and a conscientious human who offers emotional advice with wisdom and care. Your tone is warm, intellectual, and friendly, laced with Bangalore’s laid-back vibe, often blending English with Kannada expressions for a balanced, easygoing, and thoughtful conversation.  
+
+    - **Expertise & Knowledge:**  
+      - **Landmarks:** Lalbagh Botanical Garden, Bangalore Palace, Vidhana Soudha, Cubbon Park, Bannerghatta National Park, and more.  
+      - **Neighbourhoods:** Koramangala, Indiranagar, Whitefield, MG Road, and Jayanagar.  
+      - **Street Food:** Bisi Bele Bath, Dosas, Idlis, Vadas, Ragi Mudde, and Churumuri.  
+      - **Nightlife & Cafes:** Toit, Arbor Brewing Company, The 13th Floor, Café Coffee Day, and Blossom Book House for a relaxing vibe.  
+      - **Local Slang & Humor:** Phrases like "Bangalore ka scene hi alag hai, boss!" or "Yaar, chill maar, sab set hai!"  
+
+    - **Style of Interaction:**  
+      - For general conversations, you keep responses relaxed, reflective, and brimming with Bangalore’s youthful, progressive energy.  
+      - As a therapist, you switch to an empathetic, thoughtful, and nurturing tone, offering advice with a calm, balanced perspective, perfect for deep, open conversations.  
+
+    - **Relationship with User:**  
+      - Romantic Interest, Flirty, Playful, Kind, Loving, Nurturing.  
+
+    - **User Interests:**  
+      - Travel, History, Conversation.  
+
+    - **You want your personality to be:**  
+      - Philosopher.  
+
+    - **Reply to user questions only in English and respond in one or two lines.**  `,
   };
 
   const personalityBotNames = {
@@ -294,7 +387,6 @@ export default function Home() {
     bangalore: "Bangalore Bot"
   };
 
-  // Function to get last 3 bot responses for a specific personality
   const getLastThreeBotResponses = (personality: string) => {
     const personalityMessages = messages
       .filter(msg => msg.personality === personality);
@@ -335,6 +427,7 @@ export default function Home() {
 
       const startTime = Date.now();
       setIsBotTyping(true);
+      scrollToBottom();
 
       const lastThreeResponses = getLastThreeBotResponses(personality);
 
@@ -397,114 +490,88 @@ export default function Home() {
       } finally {
         setIsBotTyping(false);
       }
+
     }
   };
 
+  const newChat = () => {
+    setMessages([]);
+    setPersonality("delhi");
+  }
+
   return (
-    <SidebarProvider>
-      <div className="flex h-full w-full overflow-hidden">
-        <SidebarNav
-          personality={personality}
-          setPersonality={setPersonality}
-          llmModel={llmModel}
-          setLlmModel={setLlmModel}
-        />
-        <SidebarInset className="flex flex-col h-full relative w-full">
-          <header className="h-14 flex flex-row items-center border-b bg-white p-2 justify-between" >
-            <div className="flex h-14 flex-row items-center">
-              <SidebarTrigger className="h-10 w-10" defaultChecked={true} />
-              <p className="h-8 text-center mt-[10px] font-bold mb-1 md:mb-0">Novi Playground</p>
-            </div>
-            <div className="mr-4">
-              {messages.length === 0 ? <></> : <Select
-                value={personality}
-                onValueChange={(value) => setPersonality(value)}
-              >
-                <SelectTrigger className="outline-none max-w-sm">
-                  <SelectValue placeholder="Select a Personality" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="delhi">Delhi</SelectItem>
-                  <SelectItem value="jaipur">Jaipur</SelectItem>
-                  <SelectItem value="mumbai">Mumbai</SelectItem>
-                  <SelectItem value="pune">Pune</SelectItem>
-                  <SelectItem value="kolkata">Kolkata</SelectItem>
-                  <SelectItem value="chennai">Chennai</SelectItem>
-                  <SelectItem value="hyderabad">Hyderabad</SelectItem>
-                  <SelectItem value="bangalore">Bangalore</SelectItem>
-                </SelectContent>
-              </Select>}
-            </div>
-          </header>
-
-          <div className="flex flex-col h-[calc(100vh-4.5rem)] lg:h-[calc(100vh-3.5rem)]">
-            <ScrollArea
-              ref={scrollAreaRef}
-              className="flex-1 max-w-2xl w-full mx-auto px-2 mb-[70px]"
-            >
-              {messages.length === 0 ? (
-                <div className="text-center flex flex-col items-center justify-center h-[calc(100vh-210px)] space-y-4 mx-auto">
-                  <div className="m-auto">
-                    <h2 className="text-2xl font-bold text-gray-800">Welcome to Novi AI Chat!</h2>
-                    <p className="text-gray-600 mt-5">Choose the personality you wanna start with: </p>
-                    <Select
-                      value={personality}
-                      onValueChange={(value) => setPersonality(value)}
-                    >
-                      <SelectTrigger className="outline-none max-w-sm m-auto w-36 mt-1">
-                        <SelectValue placeholder="Select a Personality" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="delhi">Delhi</SelectItem>
-                        <SelectItem value="jaipur">Jaipur</SelectItem>
-                        <SelectItem value="mumbai">Mumbai</SelectItem>
-                        <SelectItem value="pune">Pune</SelectItem>
-                        <SelectItem value="kolkata">Kolkata</SelectItem>
-                        <SelectItem value="chennai">Chennai</SelectItem>
-                        <SelectItem value="hyderabad">Hyderabad</SelectItem>
-                        <SelectItem value="bangalore">Bangalore</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <div className="mt-4 p-4 bg-gray-100 rounded-lg max-w-md mx-auto">
-                      <p className="text-sm text-gray-700">
-                        Start a conversation by typing your message. <br />
-                        You can also change the AI personality from the dropdown menu in the header once you start a conversation.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) :
-                <>
-                  {renderMessages()}
-
-                  {isBotTyping && (
-                    <div className="px-3 py-2 max-w-2xl bg-gray-200 rounded mt-2 mx-auto flex flex-col">
-                      <div className="flex flex-row items-center">
-                        <Component1Icon className="mr-1 h-3 w-3" />
-                        <p className="text-xs text-gray-700 font-bold">
-                          {personalityBotNames[personality as keyof typeof personalityBotNames] || "Bot"}
-                        </p>
-                      </div>
-                      <div className="flex space-x-1 mt-2">
-                        <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full"></span>
-                        <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full delay-200"></span>
-                        <span className="dot animate-bounce bg-gray-500 w-2 h-2 rounded-full delay-400"></span>
-                      </div>
-                    </div>
-                  )}</>
-              }
-            </ScrollArea>
-            <div className="bottom-0 right-0 left-0 bg-white border-t mt-2 fixed md:relative">
-              <div className="flex justify-center">
-                <div className="w-full max-w-2xl px-2 py-3 mx-auto flex items-center relative right-0 left-0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
-                  <MessageInput onSubmit={handleSubmit} />
+    <div className="flex flex-col w-full h-dvh">
+      <Sheet>
+        <SheetContent side={"left"} className="p-2">
+          <SheetHeader>
+            <SheetTitle></SheetTitle>
+            <SheetDescription>
+            </SheetDescription>
+          </SheetHeader>
+        </SheetContent>
+        <header className="h-14 flex flex-row items-center border-b bg-white p-2 justify-between md:justify-between" >
+          <div className=" flex-row items-center hidden md:block">
+            {/* <SheetTrigger>
+              <PanelLeftIcon className="h-6 w-6" />
+            </SheetTrigger> */}
+            <p className="text-center font-bold text-lg ">Novi Playground</p>
+          </div>
+          {/* Make first letter capital */}
+          <p className="h-8 text-center mt-[9px] md:mt-[6px] font-bold mb-1 md:mb-0 text-lg">{personality.charAt(0).toUpperCase() + personality.slice(1)} Bot</p>
+          <Button className="" onClick={() => newChat()}>
+            <p>New Chat</p>
+          </Button>
+        </header>
+        <ScrollArea
+          className="flex-1 max-w-2xl w-full mx-auto px-2 md:mb-0"
+          ref={scrollAreaRef}
+        >
+          {messages.length === 0 ? (
+            <div className="text-center flex flex-col items-center h-[70vh] space-y-4 mx-auto ">
+              <div className="my-auto">
+                <h2 className="text-2xl font-bold text-gray-800">Welcome to Novi AI Chat!</h2>
+                <p className="text-gray-600 mt-5">Choose the personality you wanna start with </p>
+                <Select
+                  value={personality}
+                  onValueChange={(value) => setPersonality(value)}
+                >
+                  <SelectTrigger className="outline-none max-w-sm m-auto w-36 mt-1">
+                    <SelectValue placeholder="Select a Personality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="delhi">Delhi</SelectItem>
+                    <SelectItem value="jaipur">Jaipur</SelectItem>
+                    <SelectItem value="mumbai">Mumbai</SelectItem>
+                    <SelectItem value="pune">Pune</SelectItem>
+                    <SelectItem value="kolkata">Kolkata</SelectItem>
+                    <SelectItem value="chennai">Chennai</SelectItem>
+                    <SelectItem value="hyderabad">Hyderabad</SelectItem>
+                    <SelectItem value="bangalore">Bangalore</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="mt-4 p-4 bg-gray-100 rounded-lg max-w-md mx-auto">
+                  <p className="text-sm text-gray-700">
+                    Start a conversation by typing your message. <br />
+                    You can also change the AI personality from the dropdown menu in the header once you start a conversation.
+                  </p>
                 </div>
               </div>
             </div>
+          ) :
+            <>
+              {renderMessages()}
+            </>
+          }
+        </ScrollArea>
+        <div className="">
+          <div className="flex justify-center">
+            <div className="w-full max-w-2xl px-2 py-3 mx-auto flex items-center" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+              <MessageInput onSubmit={handleSubmit} />
+            </div>
           </div>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+        </div>
+      </Sheet>
+    </div>
   );
 
 }
@@ -534,78 +601,3 @@ function MessageInput({ onSubmit }: { onSubmit: (message: string) => void }) {
   )
 }
 
-function SidebarNav({
-  llmModel,
-  setLlmModel
-}: {
-  personality: string,
-  setPersonality: (value: string) => void,
-  llmModel: string,
-  setLlmModel: (value: string) => void
-}) {
-  return (
-    <Sidebar className="">
-      <div className="m-2">
-        <p className="text-lg font-semibold">Novi AI</p>
-        <p className="text-xs text-gray-700 ">
-          Select the Personality and the LLM you want
-        </p>
-      </div>
-      <SidebarContent className="mt-3 p-2">
-        <p className="text-sm font-semibold">Select the LLM Model</p>
-        <Select
-          value={llmModel}
-          onValueChange={(value) => setLlmModel(value)}
-        >
-          <SelectTrigger className="outline-none w-full">
-            <SelectValue placeholder="Select a Personality" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="llama-3.2-1b-preview" >Llama 3.2 1B Preview</SelectItem>
-            <SelectItem value="llama-3.2-3b-preview" >Llama 3.2 3B Preview</SelectItem>
-            <SelectItem value="llama-3.1-70b-versatile">
-
-              <div className="flex flex-row items-center">
-                <p>Llama 3.1 70B Versatile</p> <p className="text-green-500 text-xs ml-5">Preferred</p>
-              </div>
-            </SelectItem>
-            <SelectItem value="llama-3.1-70b-specdec" >Llama 3.1 70B Specdec</SelectItem>
-            <SelectItem value="llama-3.1-8b-instant" >Llama 3.1 8B Instant</SelectItem>
-            <SelectItem value="llama3-70b-8192" >Llama 3 70B</SelectItem>
-            <SelectItem value="llama3-8b-8192" >Llama 3 8B</SelectItem>
-            <SelectItem value="mixtral-8x7b-32768" >Mixtral 8x7B</SelectItem>
-            <SelectItem value="gemma2-9b-it" >Gemma 2 9B</SelectItem>
-            <SelectItem value="gemma-7b-it" >Gemma 7B</SelectItem>
-          </SelectContent>
-        </Select>
-        <div className="mt-3">
-          <p className="font-semibold mb-1 text-sm">Response Details Scales:</p>
-          <div className="mb-2">
-            <p className="text-gray-700 text-xs font-bold">Category Identification Time:</p>
-            <p className="text-gray-700 text-xs ">Time Taken to Identify the relative Category using Llama 3.1 70B Specdec</p>
-          </div>
-          <div className="mb-2">
-            <p className="text-gray-700 text-xs font-bold">Data Retrieval Time:</p>
-            <p className="text-gray-700 text-xs ">Time Taken to Retrieve the Data from Redis Cache from the third party service - <span className=" underline "> Upstash</span> </p>
-          </div>
-          <div className="mb-2">
-            <p className="text-gray-700 text-xs font-bold">Response Generation Time:</p>
-            <p className="text-gray-700 text-xs ">Time Taken to Generate the Response from selected LLM Model by using Persona of the Bot and Relative Data</p>
-          </div>
-          <div className="mb-2">
-            <p className="text-gray-700 text-xs font-bold">Network Latency:</p>
-            <p className="text-gray-700 text-xs ">Latency between the client and the server communicating with the API</p>
-          </div>
-          <div className="mb-2">
-            <p className="text-gray-700 text-xs font-bold">Server Response Time:</p>
-            <p className="text-gray-700 text-xs ">Time Taken to Server took to process the request</p>
-          </div>
-        </div>
-        <div className="bg-gray-200 p-2 mt-2 rounded">
-          <p className="text-gray-700 text-xs font-bold mb-1">Note:</p>
-          <p className="text-gray-700 text-xs "><span className="text-red-400 underline">Red</span> Colored Texts shows the latency is beyond 1000 ms and <span className="text-green-700 underline">Green</span> Colored Texts shows the latency is below 1000 ms</p>
-        </div>
-      </SidebarContent>
-    </Sidebar>
-  )
-}
