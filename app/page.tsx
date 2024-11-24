@@ -12,7 +12,6 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet"
 
 import {
@@ -143,6 +142,7 @@ export default function Home() {
   // State for Personality and LLM selection
   const [personality, setPersonality] = useState("delhi")
   const [llmModel, setLlmModel] = useState("meta-llama/llama-3.1-70b-instruct")
+  setLlmModel("meta-llama/llama-2-7b-chat-hf")
 
   const personalityPrompts = {
     delhi: `
@@ -376,16 +376,16 @@ export default function Home() {
     - **Reply to user questions only in English and respond in one or two lines.**  `,
   };
 
-  const personalityBotNames = {
-    delhi: "Delhi Bot",
-    jaipur: "Jaipur Bot",
-    mumbai: "Mumbai Bot",
-    pune: "Pune Bot",
-    kolkata: "Kolkata Bot",
-    chennai: "Chennai Bot",
-    hyderabad: "Hyderabad Bot",
-    bangalore: "Bangalore Bot"
-  };
+  // const personalityBotNames = {
+  //   delhi: "Delhi Bot",
+  //   jaipur: "Jaipur Bot",
+  //   mumbai: "Mumbai Bot",
+  //   pune: "Pune Bot",
+  //   kolkata: "Kolkata Bot",
+  //   chennai: "Chennai Bot",
+  //   hyderabad: "Hyderabad Bot",
+  //   bangalore: "Bangalore Bot"
+  // };
 
   const getLastThreeBotResponses = (personality: string) => {
     const personalityMessages = messages
