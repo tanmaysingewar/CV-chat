@@ -480,7 +480,6 @@ export default function Home() {
                 <div className="mt-4 p-4 bg-gray-100 rounded-lg max-w-md mx-auto">
                   <p className="text-sm text-gray-700">
                     Start a conversation by typing your message. <br />
-                    You can also change the AI personality from the dropdown menu in the header once you start a conversation.
                   </p>
                 </div>
               </div>
