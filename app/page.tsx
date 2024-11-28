@@ -352,8 +352,10 @@ export default function Home() {
                 <SelectContent>
                   <SelectItem value="delhi">Delhi</SelectItem>
                   <SelectItem value="pune">Pune</SelectItem>
-                  <SelectItem value="kigaki">Kigaki</SelectItem>
-                  {/* <SelectItem value="tashkent">Tashkent</SelectItem> */}
+                  <SelectItem value="Kigali">Kigali</SelectItem>
+                  <SelectItem value="tashkent">Tashkent</SelectItem>
+                  <SelectItem value="buenos_aires">Buenos Aires</SelectItem>
+                  <SelectItem value="kuala_lumpur">Kuala Lumpur</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -438,8 +440,10 @@ export default function Home() {
                       <SelectContent>
                         <SelectItem value="delhi">Delhi</SelectItem>
                         <SelectItem value="pune">Pune</SelectItem>
-                        <SelectItem value="kigaki">Kigaki</SelectItem>
-                        {/* <SelectItem value="tashkent">Tashkent</SelectItem> */}
+                        <SelectItem value="Kigali">Kigali</SelectItem>
+                        <SelectItem value="tashkent">Tashkent</SelectItem>
+                        <SelectItem value="buenos_aires">Buenos Aires</SelectItem>
+                        <SelectItem value="kuala_lumpur">Kuala Lumpur</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
