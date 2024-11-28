@@ -426,7 +426,7 @@ export default function Home() {
                 <p className="text-gray-600 mt-5">Enter your email to get started</p>
                 <Input className="mt-4 max-w-64 mx-auto" placeholder="Enter your email" value={email}
                   onChange={(e) => setEmail(e.target.value)} />
-                <p className="text-gray-600 mt-5">Choose the personality, City and Gender</p>
+                <p className="text-gray-600 mt-5">Choose your Novi’s City, Personality and Gender</p>
                 <div className="flex flex-row items-center justify-center">
                   <div>
                     <p className="text-gray-600 mt-5 text-left text-sm">Select City</p>
