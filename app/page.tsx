@@ -285,10 +285,13 @@ export default function Home() {
         const rgt = data.rgt || 0;
         const networkLatency = totalTime - (data.cit + data.drt + data.rgt); // milliseconds
 
+        // remove the " from the data.response
+        const message_response = data.response.replace(/"/g, "");
+
         setMessages((prev) => [
           ...prev,
           {
-            message: data.response || "Sorry, I didn't understand that.",
+            message: message_response || "Sorry, I didn't understand that.",
             sender: "bot",
             modelName: "meta-llama/llama-3.1-70b-instruct",  // Add this line
             personality: fullPersonality,  // Add this line
@@ -415,7 +418,7 @@ export default function Home() {
               <p>New Chat</p>
             </Button>}
         </header>
-        <ScrollArea
+         <ScrollArea
           className="flex-1 max-w-2xl w-full mx-auto px-2 md:mb-0"
           ref={scrollAreaRef}
         >

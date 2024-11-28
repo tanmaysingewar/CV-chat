@@ -18,7 +18,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Novi AI",
-  description: "Novi AI is a conversational AI platform that uses AI to create personalized chatbots for various purposes.",
+  description: "Novi AI is a conversational AI platform where you can create a band of culturally intelligent keen friends from all around the world.",
 };
 
 export default function RootLayout({
