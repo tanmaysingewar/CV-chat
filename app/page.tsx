@@ -6,6 +6,10 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { PaperPlaneIcon } from "@radix-ui/react-icons"
 import { useState, useRef, useEffect, useCallback } from "react"
 
+import OpenAI from 'openai';
+
+let API_BASE_URL = "https://noviaillmtunning--trained-trained-unsloth-meta-llama-3-1-f02fe7.modal.run/v1" // llama 3.1 70 B model with Delhi json data input
+
 import {
   Sheet,
   SheetContent,
@@ -153,10 +157,6 @@ export default function Home() {
     });
   };
 
-  // State for Personality and LLM selection
-  // const [personality, setPersonality] = useState("delhi")
-  // const [llmModel, setLlmModel] = useState("meta-llama/llama-3.1-70b-instruct")
-
 
   // Dynamic prompt selection
   const selectDynamicPrompt = () => {
@@ -233,6 +233,12 @@ export default function Home() {
   }
 
   const handleSubmit = async (message: string) => {
+    const client = new OpenAI({
+      apiKey: "super-secret-token", // This is the default and can be omitted
+      baseURL: API_BASE_URL,
+      dangerouslyAllowBrowser: true,
+    });
+
     if (message.trim()) {
       if (messages.length === 0 && !email.trim()) {
         alert("Please enter your email before starting the chat");
@@ -256,52 +262,62 @@ export default function Home() {
       const lastThreeResponses = getLastThreeBotResponses(city, personalityType, gender);
 
       try {
-        const response = await fetch("https://summaryapi.iamtanmay.in/cv/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            question: message,
-            llm: "meta-llama/llama-3.1-70b-instruct",
-            personality: fullPersonality,
-            personality_prompt: selectDynamicPrompt(),
-            last_three_responses: lastThreeResponses,
-            conversationId,
-            // email: email  // Include email in the request
-          }),
+        // const response = await fetch("http://127.0.0.1:8000/cv/chat", {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify({
+        //     question: message,
+        //     llm: "meta-llama/llama-3.1-70b-instruct",
+        //     personality: fullPersonality,
+        //     personality_prompt: selectDynamicPrompt(),
+        //     last_three_responses: lastThreeResponses,
+        //     conversationId,
+        //     // email: email  // Include email in the request
+        //   }),
+        // });
+
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch response from the server");
+        // }
+
+        const chatCompletion = await client.chat.completions.create({
+          messages: [{"role": "system", "content": selectDynamicPrompt() + "## Your response should be in 2 lines only and in under 100 words. ## Dot't add give instruction in response. ## Dot't add any other comment in response. ## Dot't add any other instruction in response."},
+            { role: 'user', content: message }],
+          model: 'trained-unsloth-Meta-Llama-3.1-70B',
+          max_tokens: 200,
+          temperature: 0.5,
+          top_p: 1,
+          stop : ["?","<|im_start|>","<|im_end|>"]
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch response from the server");
-        }
+        // const data = await response.json();
 
-        const data = await response.json();
+        // const endTime = Date.now();
+        // const totalTime = endTime - startTime; // milliseconds
+        // const cit = data.cit || 0;
+        // const drt = data.drt || 0;
+        // const rgt = data.rgt || 0;
+        // const networkLatency = totalTime - (data.cit + data.drt + data.rgt); // milliseconds
 
-        const endTime = Date.now();
-        const totalTime = endTime - startTime; // milliseconds
-        const cit = data.cit || 0;
-        const drt = data.drt || 0;
-        const rgt = data.rgt || 0;
-        const networkLatency = totalTime - (data.cit + data.drt + data.rgt); // milliseconds
-
-        // remove the " from the data.response
-        const message_response = data.response.replace(/"/g, "");
+        // // remove the " from the data.response
+        // const message_response = data.response.replace(/"/g, "");
 
         setMessages((prev) => [
           ...prev,
           {
-            message: message_response || "Sorry, I didn't understand that.",
+            message: chatCompletion.choices[0].message.content || "Sorry, I didn't understand that.",
             sender: "bot",
             modelName: "meta-llama/llama-3.1-70b-instruct",  // Add this line
             personality: fullPersonality,  // Add this line
             conversationId,
             responseDetails: {
-              cit,
-              drt,
-              rgt,
-              networkLatency,
-              totalResponseTime: cit + drt + rgt + networkLatency
+              cit : 0,
+              drt : 0,
+              rgt : 0,
+              networkLatency : 0,
+              totalResponseTime : 0
             }
           },
         ]);
