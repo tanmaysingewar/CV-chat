@@ -283,13 +283,13 @@ export default function Home() {
         // }
 
         const chatCompletion = await client.chat.completions.create({
-          messages: [{"role": "system", "content": selectDynamicPrompt() + "## Your response should be in 2 lines only and in under 50 words. ## Dot't add give instruction in response. ## Dot't add any other comment in response. ## Dot't add any other instruction in response."},
+          messages: [{"role": "system", "content": selectDynamicPrompt() + "## Your response should be in 2 lines only and in under 50 words."},
             { role: 'user', content: message }],
           model: 'trained-unsloth-Meta-Llama-3.1-70B-v2',
           max_tokens: 200,
           temperature: 0.5,
           top_p: 1,
-          stop : ["?","<|im_start|>","<|im_end|>"]
+          stop : ["<|im_start|>","<|im_end|>","<|im_sep|>"]
         });
 
         // const data = await response.json();
@@ -304,10 +304,12 @@ export default function Home() {
         // // remove the " from the data.response
         // const message_response = data.response.replace(/"/g, "");
 
+        const message_response = chatCompletion?.choices[0]?.message?.content || "Sorry, I didn't understand that.";
+
         setMessages((prev) => [
           ...prev,
           {
-            message: chatCompletion.choices[0].message.content || "Sorry, I didn't understand that.",
+            message: message_response || "Sorry, I didn't understand that.",
             sender: "bot",
             modelName: "meta-llama/llama-3.1-70b-instruct",  // Add this line
             personality: fullPersonality,  // Add this line
