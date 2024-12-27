@@ -283,7 +283,7 @@ export default function Home() {
         // }
 
         const chatCompletion = await client.chat.completions.create({
-          messages: [{"role": "system", "content": selectDynamicPrompt() + "## Your response should be in 2 lines only and in under 100 words. ## Dot't add give instruction in response. ## Dot't add any other comment in response. ## Dot't add any other instruction in response."},
+          messages: [{"role": "system", "content": selectDynamicPrompt() + "## Your response should be in 2 lines only and in under 50 words. ## Dot't add give instruction in response. ## Dot't add any other comment in response. ## Dot't add any other instruction in response."},
             { role: 'user', content: message }],
           model: 'trained-unsloth-Meta-Llama-3.1-70B',
           max_tokens: 200,
