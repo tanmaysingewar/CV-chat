@@ -8,7 +8,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 
 import OpenAI from 'openai';
 
-let API_BASE_URL = "https://noviaillmtunning--trained-trained-unsloth-meta-llama-3-1-f02fe7.modal.run/v1" // llama 3.1 70 B model with Delhi json data input
+const API_BASE_URL = "https://noviaillmtunning--trained-trained-unsloth-meta-llama-3-1-f02fe7.modal.run/v1" // llama 3.1 70 B model with Delhi json data input
 
 import {
   Sheet,
@@ -196,41 +196,41 @@ export default function Home() {
   //   bangalore: "Bangalore Bot"
   // };
 
-  const getLastThreeBotResponses = (city: string, personalityType: string, gender: string) => {
-    const personalityMessages = messages
-      .filter(msg => {
-        const matchingPersonality = msg.personality.includes(city) &&
-          msg.personality.includes(personalityType) &&
-          msg.personality.includes(gender);
-        return matchingPersonality;
-      });
+  // const getLastThreeBotResponses = (city: string, personalityType: string, gender: string) => {
+  //   const personalityMessages = messages
+  //     .filter(msg => {
+  //       const matchingPersonality = msg.personality.includes(city) &&
+  //         msg.personality.includes(personalityType) &&
+  //         msg.personality.includes(gender);
+  //       return matchingPersonality;
+  //     });
 
-    // Same logic as before to get last three conversation pairs
-    const lastThreePairs = personalityMessages
-      .reduce<{ userMessage: string, botMessage: string, conversationId?: string }[]>((pairs, msg) => {
-        if (msg.sender === 'user') {
-          pairs.push({
-            userMessage: msg.message,
-            botMessage: '',
-            conversationId: msg.conversationId
-          });
-        } else if (msg.sender === 'bot' && pairs.length > 0) {
-          const lastPair = pairs[pairs.length - 1];
-          if (lastPair.conversationId === msg.conversationId) {
-            lastPair.botMessage = msg.message;
-          }
-        }
-        return pairs;
-      }, [])
-      .filter(pair => pair.botMessage)
-      .slice(-3)
-      .map((pair, index) =>
-        `Conversation ${index + 1}:\nUser: ${pair.userMessage}\nBot: ${pair.botMessage}`
-      )
-      .join('\n\n');
+  //   // Same logic as before to get last three conversation pairs
+  //   const lastThreePairs = personalityMessages
+  //     .reduce<{ userMessage: string, botMessage: string, conversationId?: string }[]>((pairs, msg) => {
+  //       if (msg.sender === 'user') {
+  //         pairs.push({
+  //           userMessage: msg.message,
+  //           botMessage: '',
+  //           conversationId: msg.conversationId
+  //         });
+  //       } else if (msg.sender === 'bot' && pairs.length > 0) {
+  //         const lastPair = pairs[pairs.length - 1];
+  //         if (lastPair.conversationId === msg.conversationId) {
+  //           lastPair.botMessage = msg.message;
+  //         }
+  //       }
+  //       return pairs;
+  //     }, [])
+  //     .filter(pair => pair.botMessage)
+  //     .slice(-3)
+  //     .map((pair, index) =>
+  //       `Conversation ${index + 1}:\nUser: ${pair.userMessage}\nBot: ${pair.botMessage}`
+  //     )
+  //     .join('\n\n');
 
-    return lastThreePairs;
-  }
+  //   return lastThreePairs;
+  // }
 
   const handleSubmit = async (message: string) => {
     const client = new OpenAI({
@@ -255,11 +255,11 @@ export default function Home() {
       };
       setMessages((prev) => [...prev, userMessage]);
 
-      const startTime = Date.now();
+      // const startTime = Date.now();
       setIsBotTyping(true);
       scrollToBottom();
 
-      const lastThreeResponses = getLastThreeBotResponses(city, personalityType, gender);
+      // const lastThreeResponses = getLastThreeBotResponses(city, personalityType, gender);
 
       try {
         // const response = await fetch("http://127.0.0.1:8000/cv/chat", {
