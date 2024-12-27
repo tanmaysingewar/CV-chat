@@ -8,7 +8,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 
 import OpenAI from 'openai';
 
-const API_BASE_URL = "https://noviaillmtunning--trained-trained-unsloth-meta-llama-3-1-f02fe7.modal.run/v1" // llama 3.1 70 B model with Delhi json data input
+const API_BASE_URL = "https://qyisbqb--trained-trained-unsloth-meta-llama-3-1-70b-v2-serve.modal.run/v1" // llama 3.1 70 B model with Delhi json data input
 
 import {
   Sheet,
@@ -285,7 +285,7 @@ export default function Home() {
         const chatCompletion = await client.chat.completions.create({
           messages: [{"role": "system", "content": selectDynamicPrompt() + "## Your response should be in 2 lines only and in under 50 words. ## Dot't add give instruction in response. ## Dot't add any other comment in response. ## Dot't add any other instruction in response."},
             { role: 'user', content: message }],
-          model: 'trained-unsloth-Meta-Llama-3.1-70B',
+          model: 'trained-unsloth-Meta-Llama-3.1-70B-v2',
           max_tokens: 200,
           temperature: 0.5,
           top_p: 1,
