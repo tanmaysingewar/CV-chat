@@ -285,7 +285,7 @@ export default function Home() {
         const chatCompletion = await client.chat.completions.create({
           messages: [{"role": "system", "content": selectDynamicPrompt() + "## Your response should be in 2 lines only and in under 50 words."},
             { role: 'user', content: message }],
-          model: 'trained-unsloth-Meta-Llama-3.1-70B-v2',
+          model: 'trained-unsloth-Meta-Llama-3.1-70B-v2-full-length',
           max_tokens: 200,
           temperature: 0.5,
           top_p: 1,
