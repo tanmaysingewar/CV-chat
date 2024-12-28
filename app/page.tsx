@@ -8,7 +8,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 
 import OpenAI from 'openai';
 
-const API_BASE_URL = "https://qyisbqb--trained-trained-unsloth-meta-llama-3-1-70b-v2-serve.modal.run/v1" // llama 3.1 70 B model with Delhi json data input
+const API_BASE_URL = "https://qyisbqb--trained-trained-unsloth-meta-llama-3-1-70b-v2-f-0e4199.modal.run/v1" // llama 3.1 70 B model with Delhi json data input
 
 import {
   Sheet,
@@ -289,7 +289,7 @@ export default function Home() {
           max_tokens: 200,
           temperature: 0.5,
           top_p: 1,
-          stop : ["<|im_start|>","<|im_end|>","<|im_sep|>"]
+          stop : ["<|im_start|>","<|im_end|>","<|im_sep|>","[|im_end|]"]
         });
 
         // const data = await response.json();
